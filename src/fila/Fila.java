@@ -2,12 +2,21 @@ package fila;
 
 import java.util.Scanner;
 
+class Pessoa {
+
+    String nome;
+    Pessoa proximo;
+
+    public Pessoa(String nome) {
+        this.nome = nome;
+    }
+}
+
 public class Fila {
 
     static Scanner aux = new Scanner(System.in);
     static Pessoa inicio = null;
     static Pessoa fim = null;
-    static int qtd = 0;
 
     public static void main(String[] args) {
         inicia();
@@ -25,7 +34,7 @@ public class Fila {
         do {
             menu();
             r = pedeInt("Informe a opção desejada: ", 0, 3);
-            
+
             switch (r) {
                 case 1:
                     incluir();
@@ -43,33 +52,50 @@ public class Fila {
         } while (r > 3 || r < 0);
     }
 
-    public static void criandoFila() {
-        inicio = criandoP();
-        fim = inicio;
-        inicio.setProximo(fim);
-        fim.setProximo(null);
-        qtd = qtd + 1;
-    }
-
-    public static Pessoa criandoP() {
-        Pessoa p = new Pessoa();
-        p.setNome(pedeString("Informe o nome do usuário(> 1 e < 50 caracteres).", 1, 50));
-        return p;
-    }
-
     public static void incluir() {
-        if (inicio == null) {
-            System.out.println("Fila vazia, criando uma nova fila...");
-            criandoFila();
-        }
+        Pessoa novo = new Pessoa(pedeString());
 
+        if (inicio == null) {
+            inicio = novo;
+            fim = novo;
+        } else {
+            // primeiro -> x -> x -> x -> x -> ultimo
+            fim.proximo = novo;
+            fim = novo;
+        }
+        System.out.println("Pessoa incluida na fila: " + novo.nome);
+        inicia();
     }
 
     public static void remover() {
-
+        if (inicio == null) {
+            System.out.println("A fila está vazia, criando fila...");
+            incluir();
+        } else {
+            System.out.println("Pessoa removida: " + inicio.nome);
+            inicio = inicio.proximo;
+            inicia();
+            if (inicio == null) {
+                fim = null;
+            }
+            
+        }
     }
 
     public static void listar() {
+
+        if (inicio == null) {
+            System.out.println("A fila está vazia, criando lista...");
+            incluir();
+        } else {
+            System.out.println("As pessoas na fila são: ");
+            Pessoa atual = inicio;
+            while (atual != null) {
+                System.out.println(" - " + atual.nome);
+                atual = atual.proximo;
+                inicia();
+            }
+        }
 
     }
 
@@ -91,21 +117,8 @@ public class Fila {
         return retorno;
     }
 
-    public static String pedeString(String msg, int max, int min) {
-        String retorno = "";
-        boolean erro;
-        do {
-            erro = false;
-            try {
-                System.out.println(msg);
-                retorno = aux.next();
-                if (retorno.length() < min || retorno.length() > max) {
-                    System.out.println("Informe um nome de " + min + " a " + max + " caracteres");
-                }
-            } catch (Exception e) {
-                erro = true;
-            }
-        } while (retorno.length() < min || retorno.length() > max || erro);
-        return retorno;
+    static String pedeString() {
+        System.out.println("Informe o nome do usuário(> 1 e < 50 caracteres).");
+        return new Scanner(System.in).nextLine().trim();
     }
 }
